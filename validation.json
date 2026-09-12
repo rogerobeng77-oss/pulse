@@ -1,0 +1,56 @@
+{
+  "dataset": "BUT PPG 2.0.0 (PhysioNet, CC-BY)",
+  "reference": "the ECG's own R-peak annotations over the same window",
+  "records_analysed": 3840,
+  "records_excluded": "48 legacy records encoding 300 samples as 300 one-sample signals",
+  "gate": {
+    "purity_min": 0.85,
+    "agreement_tol": 0.05,
+    "min_beats": 4,
+    "window_seconds": 8.0,
+    "window_step_seconds": 0.5
+  },
+  "quality_gate": {
+    "annotator_good": 795,
+    "we_accept": 202,
+    "tp": 145,
+    "tn": 2988,
+    "fp": 57,
+    "fn": 650,
+    "specificity": 0.981,
+    "sensitivity": 0.182
+  },
+  "heart_rate_on_accepted": {
+    "n": 202,
+    "share_of_corpus": 0.0526,
+    "mae_bpm": 6.11,
+    "median_bpm": 0.93,
+    "within_5_bpm": 0.851,
+    "within_10_bpm": 0.876
+  },
+  "duration_trend_within_5bpm": {
+    "4s": 0.61,
+    "6s": 0.74,
+    "8s": 0.82,
+    "10s": 0.9
+  },
+  "window_selection": {
+    "fixed_8s": {
+      "n": 149,
+      "mae": 7.33,
+      "within_5": 0.82
+    },
+    "cleanest_8s": {
+      "n": 204,
+      "mae": 6.38,
+      "within_5": 0.84
+    }
+  },
+  "honest_limits": [
+    "Validated only on 10-second recordings; the app captures 30 s and the duration trend is an extrapolation, not a measurement.",
+    "The corpus carries no atrial-fibrillation labels, so the irregularity measures are computed and described, never validated as a screen.",
+    "The tool accepts 5.3% of a deliberately noisy corpus. Low yield is the price of not reporting a wrong rate.",
+    "A refusal is a refusal, not a finding: it says the recording could not be measured, nothing about the person.",
+    "One cohort, a small number of handsets. Nothing here characterises behaviour across skin tones, cold hands, or other camera hardware."
+  ]
+}

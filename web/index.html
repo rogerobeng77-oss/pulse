@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulse — a pulse reading that knows when it is wrong</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand"><span class="mark">P</span><span class="word">Pulse</span></div>
+  <nav class="tabs">
+    <button data-view="measure" class="on">Measure</button>
+    <button data-view="method">Method</button>
+    <button data-view="evidence">Evidence</button>
+    <button data-view="limits">Limits</button>
+  </nav>
+  <div class="bar-right">
+    <span class="pill-ghost" id="srcpill">Recorded trace</span>
+    <span class="chip">PPG · 30 Hz</span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-left">
+    <label class="select">
+      <span class="select-icon">▤</span>
+      <select id="sample"></select>
+    </label>
+    <span class="tool-note" id="toolnote">Four recordings from BUT PPG, each with a simultaneous ECG</span>
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-ghost" id="replay" title="Measure again">↻</button>
+    <button class="btn-primary" id="camera"><span class="spark">◉</span> Use my camera</button>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<footer class="status">
+  <span class="legend"><i class="d-ok"></i> accepted</span>
+  <span class="legend"><i class="d-no"></i> refused</span>
+  <span class="legend"><i class="d-beat"></i> detected beat</span>
+  <span class="legend"><i class="d-win"></i> window measured</span>
+  <span class="status-right" id="statusright">nothing measured yet</span>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

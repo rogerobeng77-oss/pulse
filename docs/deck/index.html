@@ -1,0 +1,286 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pulse deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Pulse's own console palette, taken from pulse/web/app.css: an indigo
+     instrument bar, a grey page, and three result colours that mean accept,
+     look closer, refuse. */
+  :root{
+    --indigo:#4338ca; --deep:#3730a3; --soft:#ede9fe; --lav:#ddd9f8;
+    --page:#f4f5f7; --card:#fff; --line:#e5e7eb; --ink:#111827;
+    --grey:#6b7280; --grey2:#9ca3af;
+    --ok:#15803d; --okbg:#e7f6ec; --warn:#b45309; --warnbg:#fef3e2;
+    --no:#b91c1c; --nobg:#fdecec;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#d4d6dc;font-family:Inter,system-ui,sans-serif;color:var(--ink)}
+  .slide{width:1920px;height:1080px;background:var(--page);
+    padding:132px 150px;display:flex;flex-direction:column;
+    position:relative;overflow:hidden;margin:0 0 40px}
+  .mark{position:absolute;top:58px;left:150px;display:flex;align-items:center;gap:14px}
+  .tile{width:44px;height:44px;border-radius:12px;background:var(--indigo);
+    color:#fff;font-weight:700;font-size:23px;display:grid;place-items:center}
+  .wordmark{font-weight:700;font-size:27px;letter-spacing:-.012em}
+  .eyebrow{display:inline-block;font-size:20px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--deep);font-weight:600;margin-bottom:36px;
+    background:var(--soft);border-radius:999px;padding:11px 24px;align-self:flex-start}
+  h1{font-size:84px;line-height:1.09;font-weight:700;letter-spacing:-.024em;max-width:21ch}
+  h2{font-size:62px;line-height:1.13;font-weight:700;letter-spacing:-.02em;max-width:24ch}
+  .lede{font-size:32px;line-height:1.5;color:var(--grey);max-width:44ch;margin-top:34px}
+  .foot{position:absolute;bottom:56px;left:150px;right:150px;display:flex;
+    justify-content:space-between;font-size:20px;color:var(--grey2);
+    border-top:1px solid var(--line);padding-top:18px}
+  .band{margin-top:44px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:36px 46px;max-width:1480px}
+  .band p{font-size:35px;line-height:1.38}
+  .cite{margin-top:20px;font-size:22px;color:var(--grey);font-family:"IBM Plex Mono",monospace}
+
+  .slide-bar{position:absolute;top:0;left:0;right:0;height:7px;
+    background:linear-gradient(90deg,var(--deep),var(--indigo))}
+  .slide-track{position:absolute;bottom:0;left:0;right:0;height:5px;background:var(--line)}
+  .tick{position:absolute;bottom:0;left:0;width:1920px;height:5px}
+
+  .slide.figure{background:linear-gradient(140deg,#241d63,#3730a3 62%,#4338ca)}
+  .slide.figure,.slide.figure h1,.slide.figure h2{color:#fff}
+  .slide.figure .eyebrow{color:#fff;background:rgba(255,255,255,.16)}
+  .slide.figure .lede{color:#c8c4ee}
+  .slide.figure .foot{color:#a9a3dd;border-top-color:rgba(255,255,255,.2)}
+  .slide.figure .slide-track{background:rgba(255,255,255,.16)}
+  .slide.figure .slide-bar{background:rgba(255,255,255,.5)}
+  .slide.figure .band{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18)}
+
+  .bignums{margin-top:58px;display:flex;gap:104px;align-items:flex-start}
+  .bignum .v{font-size:140px;font-weight:700;letter-spacing:-.05em;line-height:1;
+    color:var(--indigo);font-variant-numeric:tabular-nums}
+  .slide.figure .bignum .v{color:#fff}
+  .bignum .k{font-size:25px;line-height:1.4;color:var(--grey);margin-top:18px;max-width:19ch}
+  .slide.figure .bignum .k{color:#c0bbe9}
+
+  .split{display:flex;gap:64px;align-items:flex-start;margin-top:8px}
+  .split .col{flex:1 1 0;min-width:0}
+  .shot{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line);
+    background:#fff;box-shadow:0 18px 44px rgba(17,24,39,.13);flex:none}
+  .shot img{position:absolute;display:block}
+  .shotcap{margin-top:15px;font-size:19px;color:var(--grey);font-family:"IBM Plex Mono",monospace}
+
+  .pill{display:inline-block;border-radius:999px;padding:7px 18px;font-size:22px;
+    font-weight:600;font-family:"IBM Plex Mono",monospace}
+  .pill.ok{background:var(--okbg);color:var(--ok)}
+  .pill.no{background:var(--nobg);color:var(--no)}
+
+  /* the duration table on the limits slide */
+  .tab{border-collapse:collapse;margin-top:34px}
+  .tab th{font-size:19px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);
+    font-weight:600;text-align:left;padding:0 44px 14px 0;border-bottom:1px solid var(--line)}
+  .tab td{font-size:34px;padding:16px 44px 16px 0;border-bottom:1px solid var(--line);
+    font-variant-numeric:tabular-nums}
+  .tab td.w{font-family:"IBM Plex Mono",monospace;color:var(--grey);font-size:28px}
+  .tab tr:last-child td{font-weight:700;color:var(--indigo)}
+
+  .nots{margin-top:8px;display:grid;gap:24px}
+  .not{border-left:4px solid var(--lav);padding:2px 0 2px 24px}
+  .not b{display:block;font-size:26px;font-weight:600;margin-bottom:7px}
+  .not p{font-size:22px;line-height:1.44;color:var(--grey)}
+
+  /* One openly licensed photograph per opening slide, held to the right third
+     and faded into the page so it sits behind the type rather than fighting it.
+     z-index:0 on the plate rather than a child-selector override -- a blanket
+     rule here has twice beaten position:absolute on specificity in this repo. */
+  .photo{position:absolute;top:0;right:0;bottom:0;width:36%;z-index:0;
+    background-size:cover;background-position:38% 42%;filter:grayscale(.15) contrast(1.04)}
+  .photo::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(90deg,#f4f5f7 0%,rgba(244,245,247,.72) 20%,rgba(244,245,247,0) 62%)}
+  .credit{position:absolute;right:24px;bottom:52px;z-index:3;font-family:"IBM Plex Mono",monospace;font-size:14px;color:#fff;background:rgba(12,16,24,.62);padding:6px 12px;border-radius:7px;backdrop-filter:blur(2px)}
+  .plate-fig{position:absolute;right:150px;top:210px;width:520px;z-index:0;opacity:.92}
+  /* Slide one carries a photograph in its right column. Constrain only the
+     flow content -- the plate, credit and rules are positioned and must not
+     be caught by this, which is why they are excluded by name rather than
+     with a blanket child selector. */
+  .slide.s1 > *:not(.photo):not(.credit):not(.slide-bar):not(.slide-track):not(.tick):not(.foot):not(.mark){max-width:1060px !important}
+  .slide.s1 .cite{overflow-wrap:anywhere}
+  .slide.s1 h1{font-size:64px;line-height:1.08}
+  .slide.s1 .eyebrow{margin-bottom:24px}
+  .s1-nums{gap:76px}
+  .s1-nums .v{font-size:92px}
+  .s1-nums .k{max-width:21ch;font-size:21px}
+</style>
+
+<!-- 1 ------------------------------------------------------------------ -->
+<section class="slide s1">
+  <div class="photo" style="background-image:url(img/ppg-finger.jpg)"></div>
+  <div class="credit">TomTrottier.com, CC BY-SA 4.0, via Wikimedia Commons</div>
+  <div class="slide-bar"></div><div class="slide-track"></div><canvas class="tick" width="1920" height="5"></canvas>
+  <div class="mark"><div class="tile">P</div><div class="wordmark">Pulse</div></div>
+  <div class="eyebrow">A pulse rate through a phone camera</div>
+  <h1>Reading a rate is the easy part.</h1>
+  <p class="lede" style="max-width:46ch;margin-top:18px;font-size:27px">A fingertip over the rear
+  camera brightens the picture with every heartbeat. Recovering a number from that is arithmetic.
+  Knowing when the number is wrong is not.</p>
+    <div class="bignums s1-nums" style="margin-top:20px">
+    <div class="bignum"><div class="v">795</div>
+      <div class="k">of 3,888 smartphone recordings were graded usable by expert annotators</div></div>
+    <div class="bignum"><div class="v">4 in 5</div>
+      <div class="k">held no signal anyone could measure &mdash; and an app will still return a number</div></div>
+  </div>
+<div class="band" style="margin-top:18px;padding:22px 32px"><p style="font-size:31px">Most of the code in Pulse exists to decide whether the recording can be
+  measured at all. The common correct answer is <b>no</b>.</p>
+  <p style="font-size:24px;margin-top:12px;color:var(--grey)">The knowledge is already in the
+  room. What fails is measurement, and a wrong measurement is worse than none.</p></div>
+  <div class="foot"><span>Pulse</span><span>01</span></div>
+</section>
+
+<!-- 2 ------------------------------------------------------------------ -->
+<section class="slide figure">
+  <div class="slide-bar"></div><div class="slide-track"></div><canvas class="tick" width="1920" height="5"></canvas>
+  <div class="mark"><div class="tile" style="background:#fff;color:var(--indigo)">P</div><div class="wordmark" style="color:#fff">Pulse</div></div>
+  <div class="eyebrow">BUT PPG 2.0.0 &middot; PhysioNet &middot; CC-BY 4.0</div>
+  <h2 style="max-width:26ch">Refusing well is the product.</h2>
+  <div class="bignums" style="margin-top:54px;gap:116px">
+    <div class="bignum"><div class="v">3,840</div>
+      <div class="k">smartphone recordings, each with a simultaneous ECG and an expert
+      quality annotation</div></div>
+    <div class="bignum"><div class="v">98.1%</div>
+      <div class="k">of what the annotators called unusable, refused</div></div>
+    <div class="bignum"><div class="v">5.3%</div>
+      <div class="k">of the corpus accepted. 202 recordings</div></div>
+  </div>
+  <div class="band" style="margin-top:48px"><p>The reference rate is not the dataset's own
+  heart-rate column, which differs from the ECG's R-peaks by 2.98 bpm on average and runs at
+  roughly double the R-peak rate for one subject. It is the R-peaks, over the same window.</p></div>
+  <div class="foot"><span>python validate.py &rarr; validation.json</span><span>02</span></div>
+</section>
+
+<!-- 3 ------------------------------------------------------------------ -->
+<section class="slide">
+  <div class="slide-bar"></div><div class="slide-track"></div><canvas class="tick" width="1920" height="5"></canvas>
+  <div class="mark"><div class="tile">P</div><div class="wordmark">Pulse</div></div>
+  <div class="eyebrow">The check that does the work</div>
+  <div class="split">
+    <div class="col">
+      <h2 style="font-size:56px;max-width:18ch">A moving finger reports half the true rate.</h2>
+      <p class="lede" style="max-width:34ch">The beat detector misses alternate beats, and the
+      answer looks exactly like a slow pulse. Counting beats and reading the frequency spectrum
+      are independent estimates of the same number. Requiring them to agree within 5% is what
+      separates the two.</p>
+      <p style="margin-top:34px;font-size:30px;line-height:1.42;max-width:34ch">It refuses
+      <b>117 recordings</b> that would otherwise have produced a confident, wrong answer.</p>
+    </div>
+    <div class="col" style="flex:none">
+      <div class="shot" style="width:980px;height:655px">
+        <img src="../../screenshots/08-pulse-movement.png" alt=""
+             style="width:997px;left:-10px;top:0">
+      </div>
+      <div class="shotcap">record 112002 &middot; <span class="pill no">refused</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Pulse</span><span>03</span></div>
+</section>
+
+<!-- 4 ------------------------------------------------------------------ -->
+<section class="slide">
+  <div class="slide-bar"></div><div class="slide-track"></div><canvas class="tick" width="1920" height="5"></canvas>
+  <div class="mark"><div class="tile">P</div><div class="wordmark">Pulse</div></div>
+  <div class="eyebrow">And when it does answer</div>
+  <h2 style="font-size:56px;max-width:34ch">The median error against the ECG is under one beat
+  a minute. The mean is six.</h2>
+  <div class="bignums" style="margin-top:46px;gap:108px">
+    <div class="bignum"><div class="v" style="font-size:118px">0.93</div>
+      <div class="k" style="max-width:21ch">bpm median error, on what it accepts</div></div>
+    <div class="bignum"><div class="v" style="font-size:118px">85.1%</div>
+      <div class="k" style="max-width:21ch">of accepted readings land within 5 bpm</div></div>
+    <div class="bignum"><div class="v" style="font-size:118px;color:var(--warn)">6.11</div>
+      <div class="k" style="max-width:25ch">bpm mean. A few accepted recordings are badly
+      wrong, not slightly wrong. That tail is printed beside the headline.</div></div>
+  </div>
+  <div class="shot" style="width:1620px;height:214px;margin-top:28px">
+    <img src="../../screenshots/06-pulse-accepted.png" alt=""
+         style="width:1649px;left:-17px;top:-155px">
+  </div>
+  <div class="shotcap">record 149030 &middot; <span class="pill ok">accepted</span></div>
+  <div class="foot"><span>Pulse</span><span>04</span></div>
+</section>
+
+<!-- 5 ------------------------------------------------------------------ -->
+<section class="slide figure">
+  <div class="slide-bar"></div><div class="slide-track"></div><canvas class="tick" width="1920" height="5"></canvas>
+  <div class="mark"><div class="tile" style="background:#fff;color:var(--indigo)">P</div><div class="wordmark" style="color:#fff">Pulse</div></div>
+  <div class="eyebrow">verify_dsp.mjs, over real recordings</div>
+  <h2 style="max-width:24ch">The published numbers describe the code you actually run.</h2>
+  <p class="lede" style="max-width:52ch">The validation ran in Python. The app runs JavaScript
+  in your browser. If the two drifted, the accuracy on the page would describe software nobody
+  runs.</p>
+  <div class="bignums" style="margin-top:50px;gap:104px">
+    <div class="bignum"><div class="v">418</div>
+      <div class="k">traces compared, over 1,570 candidate windows</div></div>
+    <div class="bignum"><div class="v">0.0</div>
+      <div class="k">maximum divergence in filtered signal, rate, rmssd, sdnn, cv, pnn50</div></div>
+    <div class="bignum"><div class="v">100%</div>
+      <div class="k">identical beat indices, accept decision, chosen window, refusal text</div></div>
+  </div>
+  <div class="foot"><span>spectral purity diverges by 6.661e-16, which is float arithmetic, not disagreement</span><span>05</span></div>
+</section>
+
+<!-- 6 ------------------------------------------------------------------ -->
+<section class="slide">
+  <div class="slide-bar"></div><div class="slide-track"></div><canvas class="tick" width="1920" height="5"></canvas>
+  <div class="mark"><div class="tile">P</div><div class="wordmark">Pulse</div></div>
+  <div class="eyebrow">What is finished, and what is not claimed</div>
+  <div class="split">
+    <div class="col" style="flex:none;width:620px">
+      <h2 style="font-size:44px;max-width:19ch">Accuracy is limited by length, not by method.</h2>
+      <table class="tab">
+        <tr><th>Window</th><th>Within 5 bpm</th></tr>
+        <tr><td class="w">4 s</td><td>61%</td></tr>
+        <tr><td class="w">6 s</td><td>74%</td></tr>
+        <tr><td class="w">8 s</td><td>82%</td></tr>
+        <tr><td class="w">10 s</td><td>90%</td></tr>
+      </table>
+      <p style="margin-top:26px;font-size:23px;line-height:1.45;color:var(--grey);max-width:30ch">
+      Every recording in the corpus is ten seconds, which is the ceiling of that table. The app
+      records thirty. That the trend continues is an extrapolation, not a measurement, and the
+      limits page says so.</p>
+    </div>
+    <div class="col">
+      <div class="nots">
+        <div class="not"><b>It diagnoses nothing</b>
+          <p>It reports a pulse rate and a description of how evenly spaced the beats were,
+          or it reports nothing at all.</p></div>
+        <div class="not"><b>Not an atrial-fibrillation screen</b>
+          <p>The corpus carries no rhythm labels. The irregularity measures are computed and
+          described, never interpreted. Nothing here establishes that they detect anything.</p></div>
+        <div class="not"><b>One cohort, a few handsets</b>
+          <p>Nothing is characterised across skin tones, cold hands, nail polish or camera
+          hardware. PPG is known to behave differently across skin tones.</p></div>
+        <div class="not"><b>A refusal is not a finding</b>
+          <p>It says the recording could not be measured. It says nothing about the person.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>docs/pulse/sources.md carries every figure with its citation</span><span>06</span></div>
+</section>
+
+<script>
+/* A static slide produces no new frames, so a browser can stop painting it and
+   a screen recorder keeps handing out the buffer it already had. Drawing into a
+   canvas every frame is real paint damage that cannot be elided. If this bar is
+   frozen in the captured video, the browser stopped painting and the problem is
+   the recorder, not the deck. */
+(function slidingBar() {
+  const bars = [...document.querySelectorAll('.tick')].map(c => [c, c.getContext('2d')]);
+  if (!bars.length) return;
+  const PERIOD = 2400;
+  (function frame(now) {
+    for (const [c, ctx] of bars) {
+      const w = c.width * 0.05;
+      const x = ((now % PERIOD) / PERIOD) * (c.width + w) - w;
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.fillStyle = 'rgba(67, 56, 202, 0.85)';
+      ctx.fillRect(x, 0, w, c.height);
+    }
+    requestAnimationFrame(frame);
+  })(performance.now());
+})();
+</script>
