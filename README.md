@@ -96,3 +96,15 @@ web/              the measurement console
 
 BUT PPG 2.0.0, Nemcova et al., PhysioNet, CC-BY 4.0. Not redistributed here; `validate.py`
 expects it under `data/butppg/`.
+
+## Licence
+
+The code here is MIT licensed — see [LICENSE](LICENSE).
+
+The demo traces in `web/samples/samples.json` come from the BUT PPG database and are
+redistributed under **CC-BY 4.0**, attributed to Nemcova A, Vargova E, Smisek R, et al., *Brno
+University of Technology Smartphone PPG Database (BUT PPG)*, PhysioNet v2.0.0. The database
+itself is not redistributed.
+
+**Not a medical device.** Provided as-is, for research and demonstration. It reports a pulse
+rate or nothing at all, and diagnoses nothing.
