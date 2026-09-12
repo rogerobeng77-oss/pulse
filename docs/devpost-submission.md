@@ -5,7 +5,7 @@
 **Project name:** Pulse
 **Tagline:** A pulse reading from a phone camera that refuses to answer when it cannot answer well.
 **Live demo:** https://d1kvjmmokxigdv.cloudfront.net
-**Repository:** (fill in)
+**Repository:** https://github.com/rogerobeng77-oss/pulse
 **One-page PDF:** docs/onepager.pdf
 **Video:** (under 3:00)
 **Built with:** scipy, NumPy, vanilla JavaScript, getUserMedia, S3, CloudFront
